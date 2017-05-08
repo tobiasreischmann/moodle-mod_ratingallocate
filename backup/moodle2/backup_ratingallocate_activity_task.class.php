@@ -20,9 +20,8 @@
  * @copyright  2014 C. Usener
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-require_once($CFG->dirroot . '/mod/ratingallocate/backup/moodle2/backup_ratingallocate_activity_stepslib.php'); // Because it exists (must)
-//require_once($CFG->dirroot . '/mod/ratingallocate/backup/moodle2/backup_ratingallocate_settingslib.php'); // Because it exists (optional)
+defined('MOODLE_INTERNAL') || die();
+require_once($CFG->dirroot . '/mod/ratingallocate/backup/moodle2/backup_ratingallocate_activity_stepslib.php');
 
 /**
  * ratingallocate backup task that provides all the settings and steps to perform one
@@ -34,14 +33,14 @@ class backup_ratingallocate_activity_task extends backup_activity_task {
      * Define (add) particular settings this activity can have
      */
     protected function define_my_settings() {
-        // No particular settings for this activity
+        // No particular settings for this activity.
     }
 
     /**
      * Define (add) particular steps this activity can have
      */
     protected function define_my_steps() {
-        // ratingallocate only has one structure step
+        // Ratingallocate only has one structure step.
         $this->add_step(new backup_ratingallocate_activity_structure_step('ratingallocate_structure', 'ratingallocate.xml'));
     }
 

@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/../locallib.php');
 
 /**
@@ -136,7 +137,7 @@ class mod_ratingallocate_processor_testcase extends advanced_testcase {
         $allocations = $DB->get_records('ratingallocate_allocations');
         $allocdata = array();
         $userdata = array();
-        foreach ($allocations as $id => $allocation) {
+        foreach ($allocations as $allocation) {
             $allocdata[$allocation->userid] = "$choiceid";
             $userdata[$allocation->userid] = $allocation->userid;
         }

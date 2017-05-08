@@ -13,7 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
- 
+
 /**
  * The mod_ratingallocate ratingallocate_viewed event.
  *
@@ -31,25 +31,26 @@ defined('MOODLE_INTERNAL') || die();
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  **/
 class ratingallocate_viewed extends \core\event\base {
-    
-    public static function create_simple($coursecontext, $ratingallocateid){
-        return self::create(array('context'=>$coursecontext,'objectid'=>$ratingallocateid));
+
+    public static function create_simple($coursecontext, $ratingallocateid) {
+        return self::create(array('context' => $coursecontext, 'objectid' => $ratingallocateid));
     }
-    
+
     protected function init() {
         $this->data['crud'] = 'r';
         $this->data['edulevel'] = self::LEVEL_TEACHING;
         $this->data['objecttable'] = 'ratingallocate';
     }
- 
+
     public static function get_name() {
         return get_string('log_ratingallocate_viewed', 'mod_ratingallocate');
     }
- 
+
     public function get_description() {
-        return get_string('log_ratingallocate_viewed_description', 'mod_ratingallocate', array('userid' => $this->userid, 'ratingallocateid' => $this->objectid));
+        return get_string('log_ratingallocate_viewed_description',
+            'mod_ratingallocate', array('userid' => $this->userid, 'ratingallocateid' => $this->objectid));
     }
- 
+
     public function get_url() {
         return new \moodle_url('/mod/ratingallocate/view.php', array('m' => $this->objectid));
     }

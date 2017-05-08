@@ -37,8 +37,8 @@ class edmonds_karp_test extends basic_testcase {
         $groupsmaxsizemin = floor($ratersnum / $groupsnum);
         $groupsmaxsizemax = ceil($ratersnum / $groupsnum) + 1;
 
-        $rateminimum = 0.7; // jeder Student gibt mind. votings ab
-        $ratingmax = 5; // Rating von 1-X
+        $rateminimum = 0.7; // Jeder Student gibt mind. votings ab.
+        $ratingmax = 5; // Rating von 1-X.
         $result = array();
         $groups = array();
 
@@ -52,9 +52,9 @@ class edmonds_karp_test extends basic_testcase {
 
         for ($i = 1; $i < $ratersnum; $i++) {
             $ratingsgiven = 0;
-            // create a rating for each group (or not, but simulate...)
+            // Create a rating for each group (or not, but simulate...)
             for ($l = 1; $l < $groupsnum; $l++) {
-                // create a rating for this group?
+                // Create a rating for this group?
                 if ($l * $rateminimum > $ratingsgiven) {
                     $rating = rand(1, $ratingmax);
                 } else {
@@ -89,10 +89,9 @@ class edmonds_karp_test extends basic_testcase {
 
     public function teston_random() {
         if (!PHPUNIT_LONGTEST) {
-            return; // this test takes longer than 10s
+            return; // This test takes longer than 10s.
         }
-        $testparams = array(array(5, 25), array(10, 50), array(10, 100), array(20, 200)); // , array(40, 400), array(45, 600), array(85, 1000));
-        // $testparams = array(array(10,25), array(3,25), array(29,200), array(8,200), array(64,1000), array(16,1000));
+        $testparams = array(array(5, 25), array(10, 50), array(10, 100), array(20, 200));
         $testergebnisse = array();
         foreach ($testparams as $testset) {
             // $paramgroups = $testset[0];
@@ -102,12 +101,13 @@ class edmonds_karp_test extends basic_testcase {
             $rundenergebnis = array();
             for ($i = 0; $i < 10; $i++) {
                 $ergebnis = $this->perform_race($paramgroups, $paramusers);
-                $this->assertEquals($ergebnis['ford-fulkerson Koegel2014']['gesamtpunktzahl'], $ergebnis['edmonds_karp']['gesamtpunktzahl']);
+                $this->assertEquals($ergebnis['ford-fulkerson Koegel2014']['gesamtpunktzahl'],
+                    $ergebnis['edmonds_karp']['gesamtpunktzahl']);
                 $rundenergebnis[] = $ergebnis;
             }
             $durchschnitt = array();
             $counter = 0;
-            // Durchschnitt der Runde berechnen
+            // Durchschnitt der Runde berechnen.
             foreach ($rundenergebnis as $einzelergebnis) {
                 $counter ++;
                 foreach ($einzelergebnis as $algname => $algresult) {
@@ -125,10 +125,9 @@ class edmonds_karp_test extends basic_testcase {
             $durchschnitt['param_groups'] = $paramgroups;
             $durchschnitt['letzte_punkte'] = $ergebnis['ford-fulkerson Koegel2014']['gesamtpunktzahl'];
 
-            // an die ganzen Testergebnisse anhängen
+            // An die ganzen Testergebnisse anhängen.
             $testergebnisse[] = $durchschnitt;
         }
-        // print_r($testergebnisse);
     }
 
     public function test_edmondskarp() {
@@ -196,15 +195,16 @@ class edmonds_karp_test extends basic_testcase {
         $this->assertEquals($expected, $distribution);
         $this->assertEquals($solver::compute_target_function($ratings, $distribution), 15);
 
-        // test against Koegels solver
+        // Test against Koegels solver.
         $solverkoe = new solver_ford_fulkerson();
         $distributionkoe = $solverkoe->compute_distribution($choices, $ratings, $usercount);
         $this->assertEquals($solverkoe::compute_target_function($ratings, $distributionkoe), 15);
-        $this->assertEquals($solverkoe::compute_target_function($ratings, $distributionkoe), $solver::compute_target_function($ratings, $distribution));
+        $this->assertEquals($solverkoe::compute_target_function($ratings, $distributionkoe),
+            $solver::compute_target_function($ratings, $distribution));
     }
 
     public function test_negweightcycle() {
-        // experimental
+        // Experimental.
         $choices = array();
         $choices[1] = new stdClass();
         $choices[1]->maxsize = 2;
@@ -244,7 +244,8 @@ class edmonds_karp_test extends basic_testcase {
         $distributionkoe = $solverkoe->compute_distribution($choices, $ratings, $usercount);
 
         $this->assertEquals($solverkoe::compute_target_function($ratings, $distributionkoe), 10);
-        $this->assertEquals($solverkoe::compute_target_function($ratings, $distributionkoe), $solver::compute_target_function($ratings, $distribution));
+        $this->assertEquals($solverkoe::compute_target_function($ratings, $distributionkoe),
+            $solver::compute_target_function($ratings, $distribution));
     }
 
     public function test_targetfunc() {

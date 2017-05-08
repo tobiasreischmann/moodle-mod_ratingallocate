@@ -38,7 +38,6 @@ class mod_ratingallocate_mod_form extends moodleform_mod {
     const CHOICE_PLACEHOLDER_IDENTIFIER = 'placeholder_for_choices';
     const STRATEGY_OPTIONS = 'strategyopt';
     const STRATEGY_OPTIONS_PLACEHOLDER = 'placeholder_strategyopt';
-    private $newchoicecounter = 0;
     private $msgerrorrequired;
 
     /**
@@ -83,8 +82,8 @@ class mod_ratingallocate_mod_form extends moodleform_mod {
         $mform->addHelpButton('name', 'ratingallocatename', self::MOD_NAME);
 
         // Adding the standard "intro" and "introformat" fields.
-        //TODO: Ensure backward-compatibility after deprecated method in Moodle 2.9 caused by MDL-49101
-        if (method_exists($this, 'standard_intro_elements')){
+        // TODO: Ensure backward-compatibility after deprecated method in Moodle 2.9 caused by MDL-49101
+        if (method_exists($this, 'standard_intro_elements')) {
             $this->standard_intro_elements();
         } else {
             $this->add_intro_editor();
@@ -113,7 +112,7 @@ class mod_ratingallocate_mod_form extends moodleform_mod {
 
         $elementname = 'publishdate';
         $mform->addElement('date_time_selector', $elementname, get_string($elementname, self::MOD_NAME),
-                $options = array('optional' => true));
+                array('optional' => true));
         $mform->setDefault($elementname, time() + 9 * 24 * 60 * 60);
 
         $elementname = 'runalgorithmbycron';
@@ -152,7 +151,7 @@ class mod_ratingallocate_mod_form extends moodleform_mod {
     /**
      * Add an settings element to the form. It is enabled only if the strategy it belongs to is selected.
      * @param string $stratfieldid id of the element to be added
-     * @param array $value array with the element type and its caption 
+     * @param array $value array with the element type and its caption
      *        (usually returned by the strategys get settingsfields methods).
      * @param string $curr_strategyid id of the strategy it belongs to
      * @param string $default default value for the element
@@ -204,15 +203,15 @@ class mod_ratingallocate_mod_form extends moodleform_mod {
             }
             $strategyplaceholder = self::STRATEGY_OPTIONS_PLACEHOLDER . '[' . $strategy . ']';
             // Add options fields.
-            $dynamicsettingsfields = $strategyclass->get_dynamic_settingfields();
-            foreach ($dynamicsettingsfields as $key => $value) {
+            $dynsettingsfields = $strategyclass->get_dynamic_settingfields();
+            foreach ($dynsettingsfields as $key => $value) {
                 $fieldid = $this->get_settingsfield_identifier($strategy, $key);
                 $this->add_settings_field($fieldid, $value, $strategy, $mform);
                 $mform->insertElementBefore($mform->removeElement($fieldid, false),
                     $strategyplaceholder);
             }
             // If any dynamic field is present, add a no submit button to refresh the page.
-            if (count($dynamicsettingsfields) > 0) {
+            if (count($dynsettingsfields) > 0) {
                 $buttonname = self::STRATEGY_OPTIONS.$strategy.'refresh';
                 $mform->registerNoSubmitButton($buttonname);
                 $mform->addElement('submit', $buttonname, get_string('refresh'));

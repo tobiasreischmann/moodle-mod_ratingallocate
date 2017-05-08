@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-use ratingallocate\db as this_db;
-
 /**
  * @package    mod
  * @subpackage mod_ratingallocate
@@ -23,6 +21,8 @@ use ratingallocate\db as this_db;
  * @copyright  based on code by Stefan Koegel copyright (C) 2013 Stefan Koegel
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+use ratingallocate\db as this_db;
 defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(__FILE__) . '/locallib.php');
@@ -68,8 +68,7 @@ class mod_ratingallocate_renderer extends plugin_renderer_base {
         return $o;
     }
 
-    public function render_ratingallocate_strategyform($mform) {
-        /* @var $mform ratingallocate_strategyform */
+    public function render_ratingallocate_strategyform(ratingallocate_strategyform $mform) {
         $o = '';
         $o .= $this->heading(get_string('your_rating', ratingallocate_MOD_NAME), 2);
         $o .= $this->format_text($mform->get_strategy_description_header() . '<br/>' . $mform->describe_strategy());
@@ -94,7 +93,7 @@ class mod_ratingallocate_renderer extends plugin_renderer_base {
 
         $accesstimestart = $status->accesstimestart;
         if ($accesstimestart > $time) {
-            // Access not yet available
+            // Access not yet available.
             $this->add_table_row_tuple($t, get_string('rating_begintime', ratingallocate_MOD_NAME), userdate($accesstimestart));
         }
 
@@ -103,7 +102,7 @@ class mod_ratingallocate_renderer extends plugin_renderer_base {
             // Due date.
             $this->add_table_row_tuple($t, get_string('rating_endtime', ratingallocate_MOD_NAME), userdate($duedate));
 
-                if($accesstimestart > 0 && $accesstimestart < $time) {
+            if ($accesstimestart > 0 && $accesstimestart < $time) {
                 // Time remaining.
                 $row = new html_table_row();
                 $cell1 = new html_table_cell(get_string('timeremaining', ratingallocate_MOD_NAME));
@@ -113,22 +112,24 @@ class mod_ratingallocate_renderer extends plugin_renderer_base {
                     $cell2 = new html_table_cell(format_time($duedate - $time));
                 }
                 $row->cells = array(
-                                $cell1,
-                                $cell2
+                        $cell1,
+                        $cell2
                 );
                 $t->data[] = $row;
             }
         }
-        if ($status->is_published && $status->publishdate) {
+        if ($status->ispublished && $status->publishdate) {
             $this->add_table_row_tuple($t, get_string('publishdate', ratingallocate_MOD_NAME), userdate($status->publishdate));
         } else if ($status->publishdate) {
-            $this->add_table_row_tuple($t, get_string('publishdate_estimated', ratingallocate_MOD_NAME), userdate($status->publishdate));
+            $this->add_table_row_tuple($t, get_string('publishdate_estimated', ratingallocate_MOD_NAME),
+                userdate($status->publishdate));
         }
 
-        if ($status->show_distribution_info && $status->accesstimestop < $time) {
-            // Print algorithm status and last run time
+        if ($status->showdistributioninfo && $status->accesstimestop < $time) {
+            // Print algorithm status and last run time.
             if ($status->algorithmstarttime) {
-                $this->add_table_row_tuple($t, get_string('last_algorithm_run_date', ratingallocate_MOD_NAME), userdate($status->algorithmstarttime));
+                $this->add_table_row_tuple($t, get_string('last_algorithm_run_date', ratingallocate_MOD_NAME),
+                    userdate($status->algorithmstarttime));
             } else {
                 $this->add_table_row_tuple($t, get_string('last_algorithm_run_date', ratingallocate_MOD_NAME), "-");
             }
@@ -136,20 +137,19 @@ class mod_ratingallocate_renderer extends plugin_renderer_base {
                 get_string('last_algorithm_run_status_' . $status->algorithmstatus, ratingallocate_MOD_NAME));
         }
 
-        //print available choices if no choice form is displayed
-        if(!empty($status->available_choices)) {
-        $row = new html_table_row();
+        // Print available choices if no choice form is displayed.
+        if (!empty($status->availablechoices)) {
+            $row = new html_table_row();
             $cell1 = new html_table_cell(get_string('rateable_choices', ratingallocate_MOD_NAME));
 
-            $choices_html = '';
-            foreach ($status->available_choices as $choice) {
-                $choices_html .= '<li>';
-                $choices_html .= format_string($choice->title);
-                $choices_html .= '</li>';
+            $choiceshtml = '';
+            foreach ($status->availablechoices as $choice) {
+                $choiceshtml .= '<li>';
+                $choiceshtml .= format_string($choice->title);
+                $choiceshtml .= '</li>';
             }
 
-            $cell2 = new html_table_cell('<ul>' . $choices_html . '</ul>');
-//             $cell2->attributes = array('class' => 'submissionnotgraded');
+            $cell2 = new html_table_cell('<ul>' . $choiceshtml . '</ul>');
             $row->cells = array(
                             $cell1,
                             $cell2
@@ -157,20 +157,20 @@ class mod_ratingallocate_renderer extends plugin_renderer_base {
             $t->data[] = $row;
         }
 
-        //print own choices if no choice form is displayed
-        if(!empty($status->own_choices) && $status->show_user_info) {
+        // Print own choices if no choice form is displayed.
+        if (!empty($status->ownchoices) && $status->showuserinfo) {
             $row = new html_table_row();
             $cell1 = new html_table_cell(get_string('your_rating', ratingallocate_MOD_NAME));
 
-            $choices_html = '';
-            foreach ($status->own_choices as $choice) {
-                $choices_html .= '<li>';
-                $choices_html .= format_string($choice->title) . ' (' . s($this->get_option_title($choice->rating, $status->strategy)) . ')';
-                $choices_html .= '</li>';
+            $choiceshtml = '';
+            foreach ($status->ownchoices as $choice) {
+                $choiceshtml .= '<li>';
+                $choiceshtml .= format_string($choice->title) .
+                    ' (' . s($this->get_option_title($choice->rating, $status->strategy)) . ')';
+                $choiceshtml .= '</li>';
             }
 
-            $cell2 = new html_table_cell('<ul>' . $choices_html . '</ul>');
-//             $cell2->attributes = array('class' => 'submissionnotgraded');
+            $cell2 = new html_table_cell('<ul>' . $choiceshtml . '</ul>');
             $row->cells = array(
                             $cell1,
                             $cell2
@@ -178,18 +178,18 @@ class mod_ratingallocate_renderer extends plugin_renderer_base {
             $t->data[] = $row;
         }
 
-        if (!empty($status->allocations) && $status->is_published) {
+        if (!empty($status->allocations) && $status->ispublished) {
             $row = new html_table_row();
             $cell1 = new html_table_cell(
                     get_string('your_allocated_choice', ratingallocate_MOD_NAME));
-            $allocation_html = '';
+            $allocationhtml = '';
             foreach ($status->allocations as $allocation) {
-                $allocation_html .= '<li>';
-                $allocation_html .= format_string($allocation->{this_db\ratingallocate_choices::TITLE});
-                $allocation_html .= '</li>';
+                $allocationhtml .= '<li>';
+                $allocationhtml .= format_string($allocation->{this_db\ratingallocate_choices::TITLE});
+                $allocationhtml .= '</li>';
             }
-            $allocation_html = '<ul>' . $allocation_html . '</ul>';
-            $cell2 = new html_table_cell($allocation_html);
+            $allocationhtml = '<ul>' . $allocationhtml . '</ul>';
+            $cell2 = new html_table_cell($allocationhtml);
             $row->cells = array($cell1, $cell2);
             $t->data[] = $row;
         }
@@ -198,22 +198,20 @@ class mod_ratingallocate_renderer extends plugin_renderer_base {
         $o .= $this->output->box_end();
 
         // Notifications if no choices exist or too few in comparison to strategy settings.
-        if (empty($status->available_choices)) {
+        if (empty($status->availablechoices)) {
             $this->add_notification(get_string('no_choice_to_rate', ratingallocate_MOD_NAME));
-        } else if ($status->necessary_choices > count($status->available_choices)) {
-            if ($status->show_distribution_info) {
-                $this->add_notification(get_string('too_few_choices_to_rate', ratingallocate_MOD_NAME, $status->necessary_choices));
+        } else if ($status->necessarychoices > count($status->availablechoices)) {
+            if ($status->showdistributioninfo) {
+                $this->add_notification(get_string('too_few_choices_to_rate', ratingallocate_MOD_NAME, $status->necessarychoices));
             }
         }
 
-        // To early to rate
+        // To early to rate.
         if ($status->accesstimestart > $time) {
              $this->add_notification(get_string('too_early_to_rate', ratingallocate_MOD_NAME), 'notifymessage');
-        }
-        // to late to rate
-        else if ($status->accesstimestop < $time) {
-            // if results already published
-            if ($status->is_published == true) {
+        } else if ($status->accesstimestop < $time) { // To late to rate.
+            // If results already published.
+            if ($status->ispublished == true) {
                 $this->add_notification(get_string('rating_is_over', ratingallocate_MOD_NAME), 'notifymessage');
             } else {
                 $this->add_notification(get_string('results_not_yet_published', ratingallocate_MOD_NAME), 'notifymessage');
@@ -247,7 +245,7 @@ class mod_ratingallocate_renderer extends plugin_renderer_base {
     /**
      * Output the ratingallocate modfify choices links
      */
-    public function modify_choices_group($ratingallocateid, $coursemoduleid, $status) {
+    public function modify_choices_group($status) {
         global $PAGE;
         $output = '';
         $output .= $this->heading(get_string('modify_choices_group', ratingallocate_MOD_NAME), 2);
@@ -255,7 +253,7 @@ class mod_ratingallocate_renderer extends plugin_renderer_base {
 
         $starturl = new moodle_url($PAGE->url->out(), array('action' => ACTION_SHOW_CHOICES));
 
-        // Get description dependent on status
+        // Get description dependent on status.
         $descriptionbaseid = 'modify_choices_group_desc_';
         $description = get_string($descriptionbaseid.$status, ratingallocate_MOD_NAME);
 
@@ -275,7 +273,7 @@ class mod_ratingallocate_renderer extends plugin_renderer_base {
     /**
      * Output the ratingallocate modfify allocation
      */
-    public function modify_allocation_group($ratingallocateid, $coursemoduleid, $status, $algorithmstatus, $runalgorithmbycron) {
+    public function modify_allocation_group($ratingallocateid, $coursemoduleid, $status) {
         global $PAGE;
         $output = '';
         $output .= $this->heading(get_string('modify_allocation_group', ratingallocate_MOD_NAME), 2);
@@ -286,7 +284,7 @@ class mod_ratingallocate_renderer extends plugin_renderer_base {
 
         $starturl = new moodle_url($PAGE->url, array('action' => ACTION_START_DISTRIBUTION));
 
-        // Get description dependent on status
+        // Get description dependent on status.
         $descriptionbaseid = 'modify_allocation_group_desc_';
         $description = get_string($descriptionbaseid.$status, ratingallocate_MOD_NAME);
 
@@ -295,7 +293,7 @@ class mod_ratingallocate_renderer extends plugin_renderer_base {
         $output .= html_writer::empty_tag('br', array());
 
         $button = new single_button($starturl, get_string('start_distribution', ratingallocate_MOD_NAME), 'get');
-        // Enable only if the instance is ready and the algorithm may run manually
+        // Enable only if the instance is ready and the algorithm may run manually.
         $button->disabled = !($ratingover);
         $button->tooltip = get_string('start_distribution_explanation', ratingallocate_MOD_NAME);
         $button->add_action(new confirm_action(get_string('confirm_start_distribution', ratingallocate_MOD_NAME)));
@@ -320,7 +318,7 @@ class mod_ratingallocate_renderer extends plugin_renderer_base {
         $output .= $this->box_start();
         $isready = $status === ratingallocate::DISTRIBUTION_STATUS_READY_ALLOC_STARTED;
 
-        // Get description dependent on status
+        // Get description dependent on status.
         $descriptionbaseid = 'publish_allocation_group_desc_';
         $description = get_string($descriptionbaseid.$status, ratingallocate_MOD_NAME);
 
@@ -344,7 +342,7 @@ class mod_ratingallocate_renderer extends plugin_renderer_base {
     /**
      * Output the ratingallocate modfify allocation
      */
-    public function reports_group($ratingallocateid, $coursemoduleid, $status, $context) {
+    public function reports_group() {
         global $PAGE;
         $output = '';
         $output .= $this->heading(get_string('reports_group', ratingallocate_MOD_NAME), 2);
@@ -352,21 +350,22 @@ class mod_ratingallocate_renderer extends plugin_renderer_base {
 
         $tableurl = new moodle_url($PAGE->url, array('action' => ACTION_SHOW_ALLOC_TABLE));
 
-        // Link to display information about the allocations and ratings
+        // Link to display information about the allocations and ratings.
         $output .= $this->action_link($tableurl->out(), get_string('show_table', ratingallocate_MOD_NAME));
 
         $output .= html_writer::empty_tag('br', array());
 
         $tableurl = new moodle_url($PAGE->url, array('action' => ACTION_SHOW_STATISTICS));
 
-        // Link to display statistical information about the allocations
+        // Link to display statistical information about the allocations.
         $output .= $this->action_link($tableurl->out(), get_string('show_allocation_statistics', ratingallocate_MOD_NAME));
 
         /* TODO: File not readable
         $output .= html_writer::empty_tag('br', array());
 
         if (has_capability('mod/ratingallocate:export_ratings', $context)) {
-            $output .= $this->action_link(new moodle_url('/mod/ratingallocate/solver/export_lp_solve.php', array('id' => $coursemoduleid,
+            $output .= $this->action_link(new moodle_url(
+                '/mod/ratingallocate/solver/export_lp_solve.php', array('id' => $coursemoduleid,
                 'ratingallocateid' => $ratingallocateid)), get_string('download_problem_mps_format', ratingallocate_MOD_NAME));
         }*/
 
@@ -451,7 +450,8 @@ class mod_ratingallocate_renderer extends plugin_renderer_base {
         } else {
             $tools .= $this->format_icon_link(ACTION_ENABLE_CHOICE, $id, 't/show', get_string('enable'));
         }
-        $tools .= $this->format_icon_link(ACTION_DELETE_CHOICE, $id, 't/delete', get_string('delete_choice', ratingallocate_MOD_NAME),
+        $tools .= $this->format_icon_link(ACTION_DELETE_CHOICE, $id, 't/delete',
+            get_string('delete_choice', ratingallocate_MOD_NAME),
             new \confirm_action(get_string('deleteconfirm', ratingallocate_MOD_NAME, $title)));
 
         return $tools;
@@ -503,7 +503,7 @@ class mod_ratingallocate_renderer extends plugin_renderer_base {
      * @return string html code representing the distribution table
      */
     public function distribution_table_for_ratingallocate(ratingallocate $ratingallocate) {
-        // Count the number of allocations with a specific rating
+        // Count the number of allocations with a specific rating.
         $distributiondata = array();
 
         $memberships = $ratingallocate->get_allocations();
@@ -516,12 +516,11 @@ class mod_ratingallocate_renderer extends plugin_renderer_base {
                 $distributiondata[$rating] = 1;
             }
         }
-        
-        // get rating titles
-        $titles = $this->get_options_titles(array_keys($distributiondata),$ratingallocate);
 
-        // Although al indizes should be numeric or null, 
-        // SORT_STRING cares for the correct comparison of null and 0
+        // Get rating titles.
+        $titles = $this->get_options_titles(array_keys($distributiondata), $ratingallocate);
+
+        // Although al indizes should be numeric or null, SORT_STRING cares for the correct comparison of null and 0.
         krsort($distributiondata, SORT_STRING);
         $allocationrow = array();
         $allocationhead = array();
@@ -573,10 +572,13 @@ class mod_ratingallocate_renderer extends plugin_renderer_base {
      *
      * @return string html code representing ratings table
      */
-    public function ratings_table_for_ratingallocate($choices, $ratings, $users, $memberships, $ratingallocate) {
+    public function ratings_table_for_ratingallocate($choices, $ratings, $memberships, $ratingallocate) {
 
-        // get rating titles
-        $titles = $this->get_options_titles(array_map(function($rating) {return $rating->rating;},$ratings), $ratingallocate);
+        // Get rating titles.
+        $titles = $this->get_options_titles(
+            array_map(function($rating) {
+                return $rating->rating;
+            }, $ratings), $ratingallocate);
 
         // Create and set up the flextable for ratings and allocations.
         $table = new mod_ratingallocate\ratings_and_allocations_table($this, $titles, $ratingallocate);
@@ -601,24 +603,32 @@ class mod_ratingallocate_renderer extends plugin_renderer_base {
      * @param unknown $ratings
      * @return multitype:Ambigous <string, lang_string>
      */
-    private function get_options_titles($ratings, ratingallocate $ratingallocate){
+    private function get_options_titles($ratings, ratingallocate $ratingallocate) {
         $titles = array();
-        $unique_ratings = array_unique($ratings);
-        $options = $ratingallocate->get_options_titles($unique_ratings);
-        foreach ($options as $id => $option){
-            $titles[$id] = empty($option) ? get_string('no_rating_given', ratingallocate_MOD_NAME): get_string('rating_raw', ratingallocate_MOD_NAME, $option);
+        $uniqueratings = array_unique($ratings);
+        $options = $ratingallocate->get_options_titles($uniqueratings);
+        foreach ($options as $id => $option) {
+            if (empty($option)) {
+                $titles[$id] = get_string('no_rating_given', ratingallocate_MOD_NAME);
+            } else {
+                $titles[$id] = get_string('rating_raw', ratingallocate_MOD_NAME, $option);
+            }
         }
         return $titles;
     }
-    
+
     /**
      * Formats the rating
      * @param unknown $rating
      * @return multitype:Ambigous <string, lang_string>
      */
-    private function get_option_title($rating, strategytemplate $strategy){
+    private function get_option_title($rating, strategytemplate $strategy) {
         $option = $strategy->translate_rating_to_titles($rating);
-        return empty($option) ? get_string('no_rating_given', ratingallocate_MOD_NAME): get_string('rating_raw', ratingallocate_MOD_NAME, $option);
+        if (empty($option)) {
+            return get_string('no_rating_given', ratingallocate_MOD_NAME);
+        } else {
+            return get_string('rating_raw', ratingallocate_MOD_NAME, $option);
+        }
     }
 
     /**

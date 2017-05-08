@@ -118,7 +118,7 @@ class ratings_and_allocations_table extends \table_sql {
                 $headers[] = get_string('firstname');
                 $columns[] = 'lastname';
                 $headers[] = get_string('lastname');
-                global $COURSE;
+
                 if (has_capability('moodle/course:useremail', $this->ratingallocate->get_context())) {
                     $columns[] = 'email';
                     $headers[] = get_string('email');

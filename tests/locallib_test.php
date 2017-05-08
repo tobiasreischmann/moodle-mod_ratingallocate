@@ -13,6 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once(dirname(__FILE__) . '/generator/lib.php');
 require_once(dirname(__FILE__) . '/../locallib.php');
@@ -139,7 +141,8 @@ class locallib_test extends advanced_testcase {
     public function test_get_ratable_choices() {
         $record = mod_ratingallocate_generator::get_default_values();
         $testmodule = new mod_ratingallocate_generated_module($this, $record);
-        $ratingallocate = mod_ratingallocate_generator::get_ratingallocate_for_user($this, $testmodule->moddb, $testmodule->teacher);
+        $ratingallocate = mod_ratingallocate_generator::get_ratingallocate_for_user($this, $testmodule->moddb,
+            $testmodule->teacher);
         $this->assertCount(1, $ratingallocate->get_rateable_choices());
     }
 

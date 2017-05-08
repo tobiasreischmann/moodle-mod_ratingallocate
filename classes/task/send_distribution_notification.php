@@ -20,36 +20,36 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_ratingallocate\task;
+defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(__FILE__).'/../../db/db_structure.php');
 use ratingallocate\db as this_db;
 
-class send_distribution_notification extends \core\task\adhoc_task {      
-    // gets executed by the task runner. Will lookup the ratingallocation object and
-    // command it to notify users                                                                     
+class send_distribution_notification extends \core\task\adhoc_task {
+    // Gets executed by the task runner. Will lookup the ratingallocation object and command it to notify users.
     public function execute() {
         global $CFG, $DB;
 
         require_once($CFG->dirroot . '/mod/ratingallocate/locallib.php');
-        
-        $site = get_site();
-        // parse customdata passed
+
+        // Parse customdata passed.
         $customdata = $this->get_custom_data();
         $userid = $customdata->userid;
         $ratingallocateid = $customdata->ratingallocateid;
 
-        //get instance of ratingallocate
-        $ratingallocate = $DB->get_record(this_db\ratingallocate::TABLE,array(this_db\ratingallocate::ID=>$ratingallocateid),'*', MUST_EXIST);
-        
+        // Get instance of ratingallocate.
+        $ratingallocate = $DB->get_record(this_db\ratingallocate::TABLE,
+            array(this_db\ratingallocate::ID => $ratingallocateid), '*', MUST_EXIST);
+
         $courseid = $ratingallocate->course;
         $course = get_course($courseid);
         $cm = get_coursemodule_from_instance('ratingallocate', $ratingallocate->id, $courseid);
         $context = \context_module::instance($cm->id);
 
         $ratingallocateobj = new \ratingallocate($ratingallocate, $course, $cm, $context);
-        
+
         $ratingallocateobj->notify_users_distribution($userid);
-        
-    }                                                                                                                               
-} 
-       
+
+    }
+}
+

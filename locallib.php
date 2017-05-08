@@ -199,16 +199,16 @@ class ratingallocate {
         if (has_capability('mod/ratingallocate:start_distribution', $this->context)) {
             /* @var mod_ratingallocate_renderer */
             $renderer = $this->get_renderer();
-            if ($this->get_algorithm_status() === \mod_ratingallocate\algorithm_status::running) {
+            if ($this->get_algorithm_status() === \mod_ratingallocate\algorithm_status::RUNNING) {
                 // Don't run, if an instance is already running.
                 $renderer->add_notification(get_string('algorithm_already_running', ratingallocate_MOD_NAME));
             } else if ($this->ratingallocate->runalgorithmbycron === "1" &&
-                $this->get_algorithm_status() === \mod_ratingallocate\algorithm_status::notstarted
+                $this->get_algorithm_status() === \mod_ratingallocate\algorithm_status::NOTSTARTED
             ) {
                 // Don't run, if the cron has not started yet, but is set as priority.
                 $renderer->add_notification(get_string('algorithm_scheduled_for_cron', ratingallocate_MOD_NAME));
             } else {
-                $this->origdbrecord->{this_db\ratingallocate::ALGORITHMSTATUS} = \mod_ratingallocate\algorithm_status::running;
+                $this->origdbrecord->{this_db\ratingallocate::ALGORITHMSTATUS} = \mod_ratingallocate\algorithm_status::RUNNING;
                 $DB->update_record(this_db\ratingallocate::TABLE, $this->origdbrecord);
                 // Try to get some more memory, 500 users in 10 groups take about 15mb.
                 raise_memory_limit(MEMORY_EXTRA);
@@ -310,8 +310,7 @@ class ratingallocate {
             $availablechoices = $this->get_rateable_choices();
             $strategysettings = $this->get_strategy_class()->get_static_settingfields();
             if (array_key_exists(ratingallocate\strategy_order\strategy::COUNTOPTIONS, $strategysettings)) {
-                $necessarychoices =
-                    $strategysettings[ratingallocate\strategy_order\strategy::COUNTOPTIONS][2];
+                $necessarychoices = $strategysettings[ratingallocate\strategy_order\strategy::COUNTOPTIONS][2];
             } else {
                 $necessarychoices = 0;
             }
@@ -471,11 +470,11 @@ class ratingallocate {
                     return $this->process_default();
                 }
                 // If form was submitted using save or cancel, show the default page.
-                if (array_key_exists("submitbutton",$data)){
+                if (array_key_exists("submitbutton", $data)) {
                     return $this->process_default();
-                // If the save and continue button was pressed,
-                // reinitialize the form to refresh the checked radiobuttons.
-                } else if (array_key_exists("submitbutton2",$data)){
+                    // If the save and continue button was pressed,
+                    // reinitialize the form to refresh the checked radiobuttons.
+                } else if (array_key_exists("submitbutton2", $data)) {
                     $mform = new manual_alloc_form($PAGE->url, $this);
                 }
             }
@@ -495,8 +494,7 @@ class ratingallocate {
             /* @var mod_ratingallocate_renderer */
             $renderer = $this->get_renderer();
             $output .= $renderer->ratings_table_for_ratingallocate($this->get_rateable_choices(),
-                    $this->get_ratings_for_rateable_choices(), $this->get_raters_in_course(),
-                    $this->get_allocations(), $this);
+                    $this->get_ratings_for_rateable_choices(), $this->get_allocations(), $this);
 
             $output .= html_writer::empty_tag('br', array());
             $output .= $OUTPUT->single_button(new moodle_url('/mod/ratingallocate/view.php', array(
@@ -661,7 +659,7 @@ class ratingallocate {
                         'action' => ACTION_GIVE_RATING)),
                     get_string('edit_rating', ratingallocate_MOD_NAME));
 
-                $output .= $OUTPUT->single_button(new moodle_url('/mod/ratingallocate/view.php',
+                    $output .= $OUTPUT->single_button(new moodle_url('/mod/ratingallocate/view.php',
                     array('id' => $this->coursemodule->id,
                         'ratingallocateid' => $this->ratingallocateid,
                         'action' => ACTION_DELETE_RATING)),
@@ -673,15 +671,14 @@ class ratingallocate {
         }
         // Print data and controls to edit the choices.
         if (has_capability('mod/ratingallocate:modify_choices', $this->context)) {
-            $output .= $renderer->modify_choices_group($this->ratingallocateid, $this->coursemodule->id, $status);
+            $output .= $renderer->modify_choices_group($status);
         }
 
         // Print data and controls for teachers.
         if (has_capability('mod/ratingallocate:start_distribution', $this->context)) {
-            $output .= $renderer->modify_allocation_group($this->ratingallocateid, $this->coursemodule->id, $status,
-                (int) $this->ratingallocate->algorithmstatus, (boolean) $this->ratingallocate->runalgorithmbycron);
+            $output .= $renderer->modify_allocation_group($this->ratingallocateid, $this->coursemodule->id, $status);
             $output .= $renderer->publish_allocation_group($this->ratingallocateid, $this->coursemodule->id, $status);
-            $output .= $renderer->reports_group($this->ratingallocateid, $this->coursemodule->id, $status, $this->context);
+            $output .= $renderer->reports_group();
         }
 
         // Logging.
@@ -777,20 +774,19 @@ class ratingallocate {
             $choicestatus->accesstimestart = $this->ratingallocate->accesstimestart;
             $choicestatus->accesstimestop = $this->ratingallocate->accesstimestop;
             $choicestatus->publishdate = $this->ratingallocate->publishdate;
-            $choicestatus->is_published = $this->ratingallocate->published;
-            $choicestatus->available_choices = $this->get_rateable_choices();
+            $choicestatus->ispublished = $this->ratingallocate->published;
+            $choicestatus->availablechoices = $this->get_rateable_choices();
             $strategysettings = $this->get_strategy_class()->get_static_settingfields();
             if (array_key_exists(ratingallocate\strategy_order\strategy::COUNTOPTIONS, $strategysettings)) {
-                $choicestatus->necessary_choices =
-                    $strategysettings[ratingallocate\strategy_order\strategy::COUNTOPTIONS][2];
+                $choicestatus->necessarychoices = $strategysettings[ratingallocate\strategy_order\strategy::COUNTOPTIONS][2];
             } else {
-                $choicestatus->necessary_choices = 0;
+                $choicestatus->necessarychoices = 0;
             }
-            $choicestatus->own_choices = $this->get_rating_data_for_user($USER->id);
+            $choicestatus->ownchoices = $this->get_rating_data_for_user($USER->id);
             $choicestatus->allocations = $this->get_allocations_for_user($USER->id);
             $choicestatus->strategy = $this->get_strategy_class();
-            $choicestatus->show_distribution_info = has_capability('mod/ratingallocate:start_distribution', $this->context);
-            $choicestatus->show_user_info = has_capability('mod/ratingallocate:give_rating', $this->context, null, false);
+            $choicestatus->showdistributioninfo = has_capability('mod/ratingallocate:start_distribution', $this->context);
+            $choicestatus->showuserinfo = has_capability('mod/ratingallocate:give_rating', $this->context, null, false);
             $choicestatus->algorithmstarttime = $this->ratingallocate->algorithmstarttime;
             $choicestatus->algorithmstatus = $this->get_algorithm_status();
             $choicestatusoutput = $renderer->render($choicestatus);
@@ -834,19 +830,17 @@ class ratingallocate {
         require_capability('mod/ratingallocate:start_distribution', $this->context);
 
         // Set algorithm status to running.
-        $this->origdbrecord->algorithmstatus = \mod_ratingallocate\algorithm_status::running;
+        $this->origdbrecord->algorithmstatus = \mod_ratingallocate\algorithm_status::RUNNING;
         $this->origdbrecord->algorithmstarttime = time();
         $this->db->update_record(this_db\ratingallocate::TABLE, $this->origdbrecord);
 
-        $distributor = new solver_edmonds_karp();
-        // $distributor = new solver_ford_fulkerson();
+        $distributor = new solver_edmonds_karp(); // Alternative: solver_ford_fulkerson().
         $timestart = microtime(true);
         $distributor->distribute_users($this);
         $timeneeded = (microtime(true) - $timestart);
-        // echo memory_get_peak_usage();
 
         // Set algorithm status to finished.
-        $this->origdbrecord->algorithmstatus = \mod_ratingallocate\algorithm_status::finished;
+        $this->origdbrecord->algorithmstatus = \mod_ratingallocate\algorithm_status::FINISHED;
         $this->db->update_record(this_db\ratingallocate::TABLE, $this->origdbrecord);
 
         return $timeneeded;
@@ -856,7 +850,7 @@ class ratingallocate {
      * Call this function when the algorithm failed and the algorithm status has to be set to failed.
      */
     public function set_algorithm_failed() {
-        $this->origdbrecord->algorithmstatus = \mod_ratingallocate\algorithm_status::failure;
+        $this->origdbrecord->algorithmstatus = \mod_ratingallocate\algorithm_status::FAILURE;
         $this->db->update_record(this_db\ratingallocate::TABLE, $this->origdbrecord);
     }
 
@@ -892,7 +886,7 @@ class ratingallocate {
      */
     public function get_choices_with_allocationcount() {
         $sql = 'SELECT c.*, al.usercount
-            FROM {ratingallocate_choices} AS c
+            FROM {ratingallocate_choices} c
             LEFT JOIN (
                 SELECT choiceid, count( userid ) AS usercount
                 FROM {ratingallocate_allocations}
@@ -1258,10 +1252,6 @@ class ratingallocate {
         global $DB;
         try {
             $transaction = $this->db->start_delegated_transaction();
-            $loggingdata = array();
-
-            $allusers = $this->get_raters_in_course();
-            $allchoices = $this->get_rateable_choices();
 
             $choice = new ratingallocate_choice($data);
             $choice->{this_db\ratingallocate_choices::RATINGALLOCATEID} = $this->ratingallocateid;
@@ -1272,11 +1262,6 @@ class ratingallocate {
             } else {
                 $DB->insert_record(this_db\ratingallocate_choices::TABLE, $choice->dbrecord);
             }
-
-            // Logging.
-//            $event = \mod_ratingallocate\event\choice_saved::create_simple(
-//                context_course::instance($this->course->id), $this->ratingallocateid, );
-//            $event->trigger();
 
             $transaction->allow_commit();
         } catch (Exception $e) {
@@ -1478,8 +1463,8 @@ class ratingallocate {
             $choicecount = count($this->get_rateable_choices());
             $strategyclass = $this->get_strategy_class();
             $strategysettings = $strategyclass->get_static_settingfields();
-            $necessary_choices = $strategysettings[ratingallocate\strategy_order\strategy::COUNTOPTIONS][2];
-            if ($choicecount < $necessary_choices) {
+            $necessarychoices = $strategysettings[ratingallocate\strategy_order\strategy::COUNTOPTIONS][2];
+            if ($choicecount < $necessarychoices) {
                 return false;
             }
         }
@@ -1549,7 +1534,7 @@ function groups_delete_group_members_by_group($groupid) {
 
         // Very ugly hack because some group-management functions are not provided in lib/grouplib.php
         // but does not add too much overhead since it does not include more files...
-        require_once (dirname(dirname(dirname(__FILE__))) . '/group/lib.php');
+        require_once(dirname(dirname(dirname(__FILE__))) . '/group/lib.php');
         foreach ($userids as $id) {
             groups_remove_member($group, $id);
         }

@@ -24,8 +24,7 @@
  * @copyright 2014 M Schulze
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-// namespace is mandatory!
-
+// Namespace is mandatory!
 namespace ratingallocate\strategy_lickert;
 
 defined('MOODLE_INTERNAL') || die();
@@ -40,12 +39,13 @@ class strategy extends \strategytemplate_options {
     const COUNTLICKERT = 'countlickert';
     private $maxlickert;
 
-    public function __construct(array $strategy_settings = null) {
-        parent::__construct($strategy_settings);
-        if (isset($strategy_settings) && array_key_exists(self::COUNTLICKERT, $strategy_settings)) {
-            $this->maxlickert = $strategy_settings[self::COUNTLICKERT];
-        } else
+    public function __construct(array $strategysettings = null) {
+        parent::__construct($strategysettings);
+        if (isset($strategysettings) && array_key_exists(self::COUNTLICKERT, $strategysettings)) {
+            $this->maxlickert = $strategysettings[self::COUNTLICKERT];
+        } else {
             $this->maxlickert = $this->get_default_settings()[self::COUNTLICKERT];
+        }
     }
 
     public function get_strategyid() {
@@ -54,13 +54,13 @@ class strategy extends \strategytemplate_options {
 
     public function get_static_settingfields() {
         return array(
-            self::MAXNO => array(// maximale Anzahl 'kannnicht'
+            self::MAXNO => array(// Maximum amount of deny.
                 'int',
                 get_string(self::STRATEGYID . '_setting_maxno', ratingallocate_MOD_NAME),
                 $this->get_settings_value(self::MAXNO),
                 null
             ),
-            self::COUNTLICKERT => array(// wie viele Felder es gibt
+            self::COUNTLICKERT => array(// How many fields in lickert scale.
                 'int',
                 get_string(self::STRATEGYID . '_setting_maxlickert', ratingallocate_MOD_NAME),
                 $this->get_settings_value(self::COUNTLICKERT),
@@ -69,10 +69,10 @@ class strategy extends \strategytemplate_options {
         );
     }
 
-    
-    public function get_dynamic_settingfields(){
+
+    public function get_dynamic_settingfields() {
         $output = array();
-        foreach($this->get_choiceoptions() as $id => $option){
+        foreach ($this->get_choiceoptions() as $id => $option) {
             $output[$id] = array(
                 'text',
                 get_string('strategy_settings_label', ratingallocate_MOD_NAME, $this->get_settings_default_value($id)),
@@ -108,24 +108,24 @@ class strategy extends \strategytemplate_options {
         }
         return $defaults;
     }
-    
-    protected function getValidationInfo(){
-        return array(self::MAXNO => array(true,0),
-                     self::COUNTLICKERT => array(true,2)
+
+    protected function get_validation_info() {
+        return array(self::MAXNO => array(true, 0),
+                     self::COUNTLICKERT => array(true, 2)
         );
     }
 }
 
-// register with the strategymanager
+// Register with the strategymanager.
 \strategymanager::add_strategy(strategy::STRATEGYID);
 
 class mod_ratingallocate_view_form extends \ratingallocate_options_strategyform {
-    //Already specified by parent class
+    // Already specified by parent class.
 
-    protected function construct_strategy($strategyoptions){
+    protected function construct_strategy($strategyoptions) {
         return new strategy($strategyoptions);
     }
-    
+
     public function get_choiceoptions() {
         $params = $this->get_strategysetting(strategy::COUNTLICKERT);
         return $this->get_strategy()->get_choiceoptions($params);

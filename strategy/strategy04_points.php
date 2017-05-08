@@ -25,8 +25,7 @@
  * @copyright based on code by M Schulze copyright (C) 2014 M Schulze
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-// namespace is mandatory!
-
+// Namespace is mandatory!
 namespace ratingallocate\strategy_points;
 
 defined('MOODLE_INTERNAL') || die();
@@ -47,49 +46,49 @@ class strategy extends \strategytemplate {
 
     public function get_static_settingfields() {
         return array(
-            self::MAXZERO => array( // maximale Anzahl 'kannnicht'
-                'int', 
-                get_string(self::STRATEGYID . '_setting_maxzero', ratingallocate_MOD_NAME), 
+            self::MAXZERO => array( // Maximum amount of deny.
+                'int',
+                get_string(self::STRATEGYID . '_setting_maxzero', ratingallocate_MOD_NAME),
                 $this->get_settings_value(self::MAXZERO),
                 null
-            ), 
-            self::TOTALPOINTS => array( // wie viele Felder es gibt
-                'int', 
-                get_string(self::STRATEGYID . '_setting_totalpoints', ratingallocate_MOD_NAME), 
+            ),
+            self::TOTALPOINTS => array( // Maximum amount of points.
+                'int',
+                get_string(self::STRATEGYID . '_setting_totalpoints', ratingallocate_MOD_NAME),
                 $this->get_settings_value(self::TOTALPOINTS),
                 null
             )
         );
     }
-    
-    public function get_dynamic_settingfields(){
+
+    public function get_dynamic_settingfields() {
         return array();
     }
-    
-    public function get_default_settings(){
+
+    public function get_default_settings() {
         return array(
                         self::MAXZERO => 3,
                         self::TOTALPOINTS => 100
         );
     }
-    
-    protected function getValidationInfo(){
-        return array(self::MAXZERO => array(true,0),
-                     self::TOTALPOINTS => array(true,1)
+
+    protected function get_validation_info() {
+        return array(self::MAXZERO => array(true, 0),
+                     self::TOTALPOINTS => array(true, 1)
         );
     }
 
 }
 
-// register with the strategymanager
+// Register with the strategymanager.
 \strategymanager::add_strategy(strategy::STRATEGYID);
 
 class mod_ratingallocate_view_form extends \ratingallocate_strategyform {
 
-    protected function construct_strategy($strategyoptions){
+    protected function construct_strategy($strategyoptions) {
         return new strategy($strategyoptions);
     }
-    
+
     public function definition() {
         global $USER;
         parent::definition();
@@ -104,11 +103,11 @@ class mod_ratingallocate_view_form extends \ratingallocate_strategyform {
             $ratingelem = $elemprefix . '[rating]';
             $groupsidelem = $elemprefix . '[choiceid]';
 
-            // choiceid ablegen
+            // Choiceid ablegen.
             $mform->addElement('hidden', $groupsidelem, $data->choiceid);
             $mform->setType($groupsidelem, PARAM_INT);
 
-            // title anzeigen
+            // Title anzeigen.
             $mform->addElement('header', $headerelem, $data->title);
             $mform->setExpanded($headerelem);
 
@@ -123,7 +122,7 @@ class mod_ratingallocate_view_form extends \ratingallocate_strategyform {
             $mform->addElement('text', $ratingelem, $data->explanation );
             $mform->setType($ratingelem, PARAM_INT);
 
-            // try to restore previous ratings
+            // Try to restore previous ratings.
             if (is_numeric($data->rating) && $data->rating >= 0) {
                 $mform->setDefault($ratingelem, $data->rating);
             } else {
@@ -133,9 +132,11 @@ class mod_ratingallocate_view_form extends \ratingallocate_strategyform {
     }
 
     public function describe_strategy() {
-        $output = get_string(strategy::STRATEGYID . '_explain_distribute_points', ratingallocate_MOD_NAME, $this->get_strategysetting(strategy::TOTALPOINTS));
+        $output = get_string(strategy::STRATEGYID . '_explain_distribute_points',
+            ratingallocate_MOD_NAME, $this->get_strategysetting(strategy::TOTALPOINTS));
         $output .= '<br />';
-        $output .= get_string(strategy::STRATEGYID . '_explain_max_zero', ratingallocate_MOD_NAME, $this->get_strategysetting(strategy::MAXZERO));
+        $output .= get_string(strategy::STRATEGYID . '_explain_max_zero',
+            ratingallocate_MOD_NAME, $this->get_strategysetting(strategy::MAXZERO));
         return $output;
     }
 
@@ -161,14 +162,16 @@ class mod_ratingallocate_view_form extends \ratingallocate_strategyform {
         if ($impossibles > $maxcrossout) {
             foreach ($ratings as $cid => $rating) {
                 if ($rating ['rating'] == 0) {
-                    $errors ['data[' . $cid . '][rating]'] = get_string(strategy::STRATEGYID . '_max_count_zero', ratingallocate_MOD_NAME, $maxcrossout);
+                    $errors ['data[' . $cid . '][rating]'] = get_string(strategy::STRATEGYID . '_max_count_zero',
+                        ratingallocate_MOD_NAME, $maxcrossout);
                 }
             }
         }
 
         if ($currentpoints <> $totalpoints) {
             foreach ($ratings as $cid => $rating) {
-                $errors ['data[' . $cid . '][rating]'] = get_string(strategy::STRATEGYID . '_incorrect_totalpoints', ratingallocate_MOD_NAME, $totalpoints);
+                $errors ['data[' . $cid . '][rating]'] = get_string(strategy::STRATEGYID . '_incorrect_totalpoints',
+                    ratingallocate_MOD_NAME, $totalpoints);
             }
         }
         return $errors;

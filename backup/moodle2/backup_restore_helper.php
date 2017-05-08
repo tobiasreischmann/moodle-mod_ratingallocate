@@ -20,25 +20,27 @@
  * @copyright  2014 C. Usener
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die();
 
-function get_fields_for_tableClass($class) {
+function get_fields_for_table_class($class) {
     $class = new ReflectionClass($class);
     $constants = $class->getConstants();
-    $keys_to_remove = array('ID', 'TABLE');
-    foreach($constants as $key => $value) {
-        if (count(array_intersect(array($key), $keys_to_remove)) > 0)
+    $keystoremove = array('ID', 'TABLE');
+    foreach ($constants as $key => $value) {
+        if (count(array_intersect(array($key), $keystoremove)) > 0) {
             unset($constants[$key]);
+        }
     }
     return array_values($constants);
 }
 
-function get_tablename_for_tableClass($class) {
+function get_tablename_for_table_class($class) {
     $class = new ReflectionClass($class);
     $constants = $class->getConstants();
     return $constants['TABLE'];
 }
 
-function get_id_for_tableClass($class) {
+function get_id_for_table_class($class) {
     $class = new ReflectionClass($class);
     $constants = $class->getConstants();
     return array($constants['ID']);

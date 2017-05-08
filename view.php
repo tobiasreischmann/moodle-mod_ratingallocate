@@ -32,16 +32,18 @@ require_once(dirname(__FILE__).'/locallib.php');
 
 require_once(dirname(__FILE__).'/solver/ford-fulkerson-koegel.php');
 
-$id = optional_param('id', 0, PARAM_INT); // course_module ID, or
-$n  = optional_param('m', 0, PARAM_INT);  // ratingallocate instance ID - it should be named as the first character of the module
+// Course_module ID.
+$id = optional_param('id', 0, PARAM_INT);
+// Ratingallocate instance ID - it should be named as the first character of the module.
+$m  = optional_param('m', 0, PARAM_INT);
 
 
 if ($id) {
     $cm         = get_coursemodule_from_id('ratingallocate', $id, 0, false, MUST_EXIST);
     $course     = get_course($cm->course);
     $ratingallocate  = $DB->get_record('ratingallocate', array('id' => $cm->instance), '*', MUST_EXIST);
-} else if ($n) {
-    $ratingallocate  = $DB->get_record('ratingallocate', array('id' => $n), '*', MUST_EXIST);
+} else if ($m) {
+    $ratingallocate  = $DB->get_record('ratingallocate', array('id' => $m), '*', MUST_EXIST);
     $course     = get_course($ratingallocate->course);
     $cm         = get_coursemodule_from_instance('ratingallocate', $ratingallocate->id, $course->id, false, MUST_EXIST);
 } else {

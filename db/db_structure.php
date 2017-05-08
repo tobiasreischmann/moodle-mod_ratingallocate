@@ -23,6 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace ratingallocate\db;
+defined('MOODLE_INTERNAL') || die();
+
 class ratingallocate {
     const TABLE = 'ratingallocate';
     const ID = 'id';

@@ -35,21 +35,18 @@ defined('MOODLE_INTERNAL') || die();
  * example constant
  */
 define('ratingallocate_MOD_NAME', 'ratingallocate');
-// define('NEWMODULE_ULTIMATE_ANSWER', 42);
 
 require_once(dirname(__FILE__).'/db/db_structure.php');
 use ratingallocate\db as this_db;
 
-// //////////////////////////////////////////////////////////////////////////////
-// Moodle core API //
-// //////////////////////////////////////////////////////////////////////////////
+// CORE API.
 
 /**
  * Returns the information on whether the module supports a feature
  *
  * @see plugin_supports() in lib/moodlelib.php
  * @param string $feature
- *        	FEATURE_xx constant for requested feature
+ *            FEATURE_xx constant for requested feature
  * @return mixed true if the feature is supported, null if unknown
  */
 function ratingallocate_supports($feature) {
@@ -58,9 +55,9 @@ function ratingallocate_supports($feature) {
             return true;
         case FEATURE_SHOW_DESCRIPTION :
             return true;
-         case FEATURE_BACKUP_MOODLE2:
+        case FEATURE_BACKUP_MOODLE2:
             return true;
-         case FEATURE_COMPLETION_TRACKS_VIEWS:
+        case FEATURE_COMPLETION_TRACKS_VIEWS:
              return true;
         default :
             return null;
@@ -75,20 +72,18 @@ function ratingallocate_supports($feature) {
  * will create a new instance and return the id number
  * of the new instance.
  *
- * @param object $ratingallocate
- *        	An object from the form in mod_form.php
- * @param mod_ratingallocate_mod_form $mform
+ * @param stdClass $ratingallocate
+ *            An object from the form in mod_form.php
  * @return int The id of the newly inserted ratingallocate record
  */
-function ratingallocate_add_instance(stdClass $ratingallocate, mod_ratingallocate_mod_form $mform = null) {
-    global $DB, $COURSE;
+function ratingallocate_add_instance(stdClass $ratingallocate) {
+    global $DB;
 
     $ratingallocate->timecreated = time();
 
     $transaction = $DB->start_delegated_transaction();
     try {
         $ratingallocate->{this_db\ratingallocate::SETTING} = json_encode($ratingallocate->strategyopt);
-        // instanz einfuegen, damit wir die ID fuer die Kinder haben
         $id = $DB->insert_record(this_db\ratingallocate::TABLE, $ratingallocate);
 
         $transaction->allow_commit();
@@ -107,12 +102,11 @@ function ratingallocate_add_instance(stdClass $ratingallocate, mod_ratingallocat
  * will update an existing instance with new data.
  *
  * @param object $ratingallocate
- *        	An object from the form in mod_form.php
+ *            An object from the form in mod_form.php
  * @param mod_ratingallocate_mod_form $mform
  * @return boolean Success/Fail
  */
-function ratingallocate_update_instance(stdClass $ratingallocate, mod_ratingallocate_mod_form $mform = null) {
-    /* @var $DB moodle_database */
+function ratingallocate_update_instance(stdClass $ratingallocate) {
     global $DB;
 
     $ratingallocate->timemodified = time();
@@ -121,7 +115,7 @@ function ratingallocate_update_instance(stdClass $ratingallocate, mod_ratingallo
     try {
         $transaction = $DB->start_delegated_transaction();
 
-        // serialize strategy settings
+        // Serialize strategy settings.
         $ratingallocate->setting = json_encode($ratingallocate->strategyopt);
 
         $bool = $DB->update_record('ratingallocate', $ratingallocate);
@@ -141,7 +135,7 @@ function ratingallocate_update_instance(stdClass $ratingallocate, mod_ratingallo
  * and any data that depends on it.
  *
  * @param int $id
- *        	Id of the module instance
+ *            Id of the module instance
  * @return boolean Success/Failure
  */
 function ratingallocate_delete_instance($id) {
@@ -153,7 +147,7 @@ function ratingallocate_delete_instance($id) {
         return false;
     }
 
-    // Delete any dependent records here #
+    // Delete any dependent records here.
     $DB->delete_records('ratingallocate_allocations', array(
         'ratingallocateid' => $ratingallocate->id
     ));
@@ -183,7 +177,7 @@ function ratingallocate_delete_instance($id) {
  * @return boolean
  */
 function ratingallocate_print_recent_activity($course, $viewfullnames, $timestart) {
-    return false; // True if anything was printed, otherwise false
+    return false; // True if anything was printed, otherwise false.
 }
 
 /**
@@ -202,7 +196,7 @@ function ratingallocate_print_recent_activity($course, $viewfullnames, $timestar
  * @param int $groupid check for a particular group's activity only, defaults to 0 (all groups)
  * @return void adds items into $activities and increases $index
  */
-function ratingallocate_get_recent_mod_activity(&$activities, &$index, $timestart, $courseid, $cmid, 
+function ratingallocate_get_recent_mod_activity(&$activities, &$index, $timestart, $courseid, $cmid,
         $userid = 0, $groupid = 0) {
 }
 
@@ -225,9 +219,7 @@ function ratingallocate_get_extra_capabilities() {
     return array();
 }
 
-// //////////////////////////////////////////////////////////////////////////////
-// File API //
-// //////////////////////////////////////////////////////////////////////////////
+// File API.
 
 /**
  * Returns the lists of all browsable file areas within the given module context
@@ -272,22 +264,21 @@ function ratingallocate_get_file_info($browser, $areas, $course, $cm, $context, 
  * @category files
  *
  * @param stdClass $course
- *        	the course object
+ *            the course object
  * @param stdClass $cm
- *        	the course module object
+ *            the course module object
  * @param stdClass $context
- *        	the ratingallocate's context
+ *            the ratingallocate's context
  * @param string $filearea
- *        	the name of the file area
+ *            the name of the file area
  * @param array $args
- *        	extra arguments (itemid, path)
+ *            extra arguments (itemid, path)
  * @param bool $forcedownload
- *        	whether or not force download
+ *            whether or not force download
  * @param array $options
- *        	additional options affecting the file serving
+ *            additional options affecting the file serving
  */
 function ratingallocate_pluginfile($course, $cm, $context, $filearea, array $args, $forcedownload, array $options = array()) {
-    global $DB, $CFG;
 
     if ($context->contextlevel != CONTEXT_MODULE) {
         send_file_not_found();
@@ -298,9 +289,7 @@ function ratingallocate_pluginfile($course, $cm, $context, $filearea, array $arg
     send_file_not_found();
 }
 
-// //////////////////////////////////////////////////////////////////////////////
-// Navigation API //
-// //////////////////////////////////////////////////////////////////////////////
+// Navigation API.
 
 /**
  * Extends the global navigation tree by adding ratingallocate nodes if there is a relevant content
@@ -308,7 +297,7 @@ function ratingallocate_pluginfile($course, $cm, $context, $filearea, array $arg
  * This can be called by an AJAX request so do not rely on $PAGE as it might not be set up properly.
  *
  * @param navigation_node $navref
- *        	An object representing the navigation tree node of the ratingallocate module instance
+ *            An object representing the navigation tree node of the ratingallocate module instance
  * @param stdClass $course
  * @param stdClass $module
  * @param cm_info $cm
@@ -324,9 +313,9 @@ function ratingallocate_extend_navigation(navigation_node $navref, stdclass $cou
  * so it is safe to rely on the $PAGE.
  *
  * @param settings_navigation $settingsnav
- *        	{@link settings_navigation}
+ *            {@link settings_navigation}
  * @param navigation_node $ratingallocatenode
- *        	{@link navigation_node}
+ *            {@link navigation_node}
  */
 function ratingallocate_extend_settings_navigation(settings_navigation $settingsnav, navigation_node $ratingallocatenode = null) {
 

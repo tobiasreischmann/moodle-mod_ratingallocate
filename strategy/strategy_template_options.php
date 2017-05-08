@@ -99,7 +99,6 @@ abstract class ratingallocate_options_strategyform extends \ratingallocate_strat
             } else {
                 $mform->setDefault($ratingelem, $maxrating);
             }
-            // $mform->setType($ratingelem, PARAM_INT);
         }
     }
 

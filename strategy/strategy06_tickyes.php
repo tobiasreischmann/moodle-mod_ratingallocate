@@ -25,8 +25,7 @@
  * @copyright based on code by M Schulze copyright (C) 2014 M Schulze
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-// namespace is mandatory!
-
+// Namespace is mandatory!
 namespace ratingallocate\strategy_tickyes;
 
 defined('MOODLE_INTERNAL') || die();
@@ -46,45 +45,45 @@ class strategy extends \strategytemplate {
 
     public function get_static_settingfields() {
         $output = array(
-            self::MINTICKYES => array('int', 
-                get_string(self::STRATEGYID . '_setting_mintickyes', ratingallocate_MOD_NAME), 
+            self::MINTICKYES => array('int',
+                get_string(self::STRATEGYID . '_setting_mintickyes', ratingallocate_MOD_NAME),
                 $this->get_settings_value(self::MINTICKYES)
             )
         );
-        
+
         $output[1] = array(
                         'text',
                         get_string('strategy_settings_label', ratingallocate_MOD_NAME, $this->get_settings_default_value(1)),
                         null,
                         $this->get_settings_default_value(1)
-                        
+
         );
         return $output;
     }
-    
-    public function get_dynamic_settingfields(){
+
+    public function get_dynamic_settingfields() {
         return array();
     }
-    
-    public function get_accept_label(){
+
+    public function get_accept_label() {
         return $this->get_settings_value(1);
     }
 
-    public function get_default_settings(){
+    public function get_default_settings() {
         return array(
                         self::MINTICKYES => 3,
                         1 => get_string(self::STRATEGYID . '_' . self::ACCEPT_LABEL, ratingallocate_MOD_NAME),
                         0 => get_string(self::STRATEGYID . '_not_' . self::ACCEPT_LABEL, ratingallocate_MOD_NAME)
         );
     }
-    
-    protected function getValidationInfo(){
-        return array(self::MINTICKYES => array(true,1)
+
+    protected function get_validation_info() {
+        return array(self::MINTICKYES => array(true, 1)
         );
     }
 }
 
-// register with the strategymanager
+// Register with the strategymanager.
 \strategymanager::add_strategy(strategy::STRATEGYID);
 
 /**
@@ -95,10 +94,10 @@ class strategy extends \strategytemplate {
  */
 class mod_ratingallocate_view_form extends \ratingallocate_strategyform {
 
-    protected function construct_strategy($strategyoptions){
+    protected function construct_strategy($strategyoptions) {
         return new strategy($strategyoptions);
     }
-    
+
     public function definition() {
         global $USER;
         parent::definition();
@@ -112,11 +111,11 @@ class mod_ratingallocate_view_form extends \ratingallocate_strategyform {
             $ratingelem = $elemprefix . '[rating]';
             $groupsidelem = $elemprefix . '[choiceid]';
 
-            // choiceid ablegen
+            // Hidden Choiceid.
             $mform->addElement('hidden', $groupsidelem, $data->choiceid);
             $mform->setType($groupsidelem, PARAM_INT);
 
-            // title anzeigen
+            // Render title.
             $mform->addElement('header', $headerelem, $data->title);
             $mform->setExpanded($headerelem);
 
@@ -127,9 +126,9 @@ class mod_ratingallocate_view_form extends \ratingallocate_strategyform {
                 get_string('choice_maxsize_display', ratingallocate_MOD_NAME) .
                 ':</span> <span class="mod-ratingallocate-choice-maxno-value">' . $data->maxsize . '</span></div>');
 
-
             // Use explanation as title/label of checkbox to align with other strategies.
-            $mform->addElement('advcheckbox', $ratingelem, $data->explanation, $this->get_strategy()->get_accept_label(), null, array(0, 1));
+            $mform->addElement('advcheckbox', $ratingelem, $data->explanation,
+                $this->get_strategy()->get_accept_label(), null, array(0, 1));
             $mform->setType($ratingelem, PARAM_INT);
 
             if (is_numeric($data->rating) && $data->rating >= 0) {
@@ -141,7 +140,8 @@ class mod_ratingallocate_view_form extends \ratingallocate_strategyform {
     }
 
     public function describe_strategy() {
-        return get_string(strategy::STRATEGYID . '_explain_mintickyes', ratingallocate_MOD_NAME, $this->get_strategysetting(strategy::MINTICKYES));
+        return get_string(strategy::STRATEGYID . '_explain_mintickyes',
+            ratingallocate_MOD_NAME, $this->get_strategysetting(strategy::MINTICKYES));
     }
 
     public function validation($data, $files) {
@@ -163,7 +163,8 @@ class mod_ratingallocate_view_form extends \ratingallocate_strategyform {
         if ($checkedaccept < $mintickyes) {
             foreach ($ratings as $cid => $rating) {
                 if ($rating ['rating'] == 0) {
-                    $errors ['data[' . $cid . '][rating]'] = get_string(strategy::STRATEGYID . '_error_mintickyes', ratingallocate_MOD_NAME, $mintickyes);
+                    $errors ['data[' . $cid . '][rating]'] = get_string(strategy::STRATEGYID . '_error_mintickyes',
+                        ratingallocate_MOD_NAME, $mintickyes);
                 }
             }
         }

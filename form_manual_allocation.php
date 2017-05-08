@@ -62,7 +62,6 @@ class manual_alloc_form extends moodleform {
         $mform->addElement('hidden', self::FORM_ACTION, ACTION_MANUAL_ALLOCATION);
         $mform->setType(self::FORM_ACTION, PARAM_TEXT);
 
-
         $mform->addElement('hidden', 'courseid', $COURSE->id);
         $mform->setType('courseid', PARAM_INT);
 
@@ -72,7 +71,7 @@ class manual_alloc_form extends moodleform {
         $this->render_filter();
     }
 
-    protected function render_filter(){
+    protected function render_filter() {
         $mform = & $this->_form;
 
         $mform->addElement('advcheckbox', 'hide_users_without_rating',
@@ -90,7 +89,7 @@ class manual_alloc_form extends moodleform {
         $mform->registerNoSubmitButton('update_filter');
     }
 
-    public function definition_after_data(){
+    public function definition_after_data() {
         parent::definition_after_data();
         global $PAGE;
 
@@ -121,14 +120,13 @@ class manual_alloc_form extends moodleform {
             $hidenorating, $showallocnecessary);
 
         $filter = $table->get_filter();
-        
+
         $mform->setDefault('hide_users_without_rating', $filter['hidenorating']);
         $mform->getElement('hide_users_without_rating')->setChecked($filter['hidenorating']);
         $mform->setDefault('show_alloc_necessary', $filter['showallocnecessary']);
         $mform->getElement('show_alloc_necessary')->setChecked($filter['showallocnecessary']);
 
         $PAGE->requires->js_call_amd('mod_ratingallocate/radiobuttondeselect', 'init');
-
 
         // The rest must be done through output buffering due to the way flextable works.
         ob_start();
@@ -137,7 +135,7 @@ class manual_alloc_form extends moodleform {
         ob_end_clean();
         $mform->addElement('html', $tableoutput);
 
-        $mform->setDefault('page', $table->get_page_start()/$table->get_page_size());
+        $mform->setDefault('page', $table->get_page_start() / $table->get_page_size());
 
         $this->add_special_action_buttons();
     }
@@ -145,9 +143,6 @@ class manual_alloc_form extends moodleform {
     /**
      * Overriding formslib's add_action_buttons() method, to add an extra submit "save changes and continue" button.
      *
-     * @param bool $cancel show cancel button
-     * @param string $submitlabel null means default, false means none, string is label text
-     * @param string $submit2label  null means default, false means none, string is label text
      * @return void
      */
     public function add_special_action_buttons() {

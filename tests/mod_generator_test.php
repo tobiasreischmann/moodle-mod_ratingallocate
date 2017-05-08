@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once(dirname(__FILE__) . '/../locallib.php');
 
@@ -30,28 +31,28 @@ class mod_ratingallocate_generator_testcase extends advanced_testcase {
 
     public function test_create_instance() {
 
-        global $DB, $USER;
+        global $DB;
         core_php_time_limit::raise();
         $this->resetAfterTest();
         $this->setAdminUser();
 
         $course = $this->getDataGenerator()->create_course();
-        
-        // There should not be any module for that course first
+
+        // There should not be any module for that course first.
         $this->assertFalse(
                 $DB->record_exists('ratingallocate', array('course' => $course->id
                 )));
         $records = $DB->get_records('ratingallocate_choices', array(), 'id');
         $this->assertEquals(0, count($records));
 
-        // create activity
+        // Create activity.
         $mod = mod_ratingallocate_generator::create_instance_with_choices($this,
                 array('course' => $course));
         $records = $DB->get_records('ratingallocate', array('course' => $course->id
         ), 'id');
         $this->assertEquals(1, count($records));
         $this->assertTrue(array_key_exists($mod->id, $records));
-        $expected_values_db = array(
+        $expectedvaluesdb = array(
             'id' => $mod->id,
             'course' => $course->id,
             'name' => 'Rating Allocation',
@@ -71,48 +72,48 @@ class mod_ratingallocate_generator_testcase extends advanced_testcase {
             'runalgorithmbycron' => '1'
         );
 
-        $this->assertEquals(json_decode(json_encode($expected_values_db, false)), reset($records));
-        // must have two choices
+        $this->assertEquals(json_decode(json_encode($expectedvaluesdb, false)), reset($records));
+        // Must have two choices.
         $records = $DB->get_records('ratingallocate_choices',
                 array('ratingallocateid' => $mod->id
                 ), 'title');
         $this->assertEquals(2, count($records));
-        $choice_ids = array_keys($records);
-        $expected_choices = array(
-            $choice_ids[0] => (object) array(
+        $choiceids = array_keys($records);
+        $expectedchoices = array(
+            $choiceids[0] => (object) array(
                 'title' => 'Choice 1',
-                'id' => $choice_ids[0],
+                'id' => $choiceids[0],
                 'ratingallocateid' => $mod->id,
                 'explanation' => 'Some explanatory text for choice 1',
                 'maxsize' => '10',
                 'active' => '1'
             ),
-            $choice_ids[1] => (object) array(
+            $choiceids[1] => (object) array(
                 'title' => 'Choice 2',
-                'id' => $choice_ids[1],
+                'id' => $choiceids[1],
                 'ratingallocateid' => $mod->id,
                 'explanation' => 'Some explanatory text for choice 2',
                 'maxsize' => '5',
                 'active' => '0'
             )
         );
-        $this->assertEquals($expected_choices, $records);
+        $this->assertEquals($expectedchoices, $records);
 
-        // Create an other mod_ratingallocate within the course
+        // Create an other mod_ratingallocate within the course.
         $params = array('course' => $course->id, 'name' => 'Another mod_ratingallocate'
         );
-        $mod =  mod_ratingallocate_generator::create_instance_with_choices($this, $params);
+        $mod = mod_ratingallocate_generator::create_instance_with_choices($this, $params);
         $records = $DB->get_records('ratingallocate', array('course' => $course->id
         ), 'id');
-        // are there 2 modules within the course
+        // Are there 2 modules within the course.
         $this->assertEquals(2, count($records));
-        // is the name correct
+        // Is the name correct.
         $this->assertEquals('Another mod_ratingallocate', $records[$mod->id]->name);
 
         $records = $DB->get_records('ratingallocate_choices', array(), 'id');
         $this->assertEquals(4, count($records));
 
-        // other tables
+        // Other tables.
         $records = $DB->get_records('ratingallocate_ratings', array(), 'id');
         $this->assertEquals(0, count($records));
         $records = $DB->get_records('ratingallocate_allocations', array(), 'id');

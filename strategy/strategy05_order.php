@@ -25,7 +25,7 @@
  * @copyright based on code by M Schulze copyright (C) 2014 M Schulze
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-// namespace is mandatory!
+// Namespace is mandatory!
 namespace ratingallocate\strategy_order;
 
 defined('MOODLE_INTERNAL') || die();
@@ -45,43 +45,43 @@ class strategy extends \strategytemplate {
 
     public function get_static_settingfields() {
         return array(
-            self::COUNTOPTIONS => array(// wie viele Felder es gibt
+            self::COUNTOPTIONS => array(// How many options to rank.
                 'int',
-                get_string(self::STRATEGYID . '_setting_countoptions', ratingallocate_MOD_NAME), 
+                get_string(self::STRATEGYID . '_setting_countoptions', ratingallocate_MOD_NAME),
                 $this->get_settings_value(self::COUNTOPTIONS),
                 null
             )
         );
     }
-    
-    public function get_dynamic_settingfields(){
+
+    public function get_dynamic_settingfields() {
         return array();
     }
-    
-    public function get_default_settings(){
-        $default_count_options = 2;
+
+    public function get_default_settings() {
+        $defaultcountoptions = 2;
         $output = array(
-                        self::COUNTOPTIONS => $default_count_options
+                        self::COUNTOPTIONS => $defaultcountoptions
         );
-        $count_options = $this->get_settings_value(self::COUNTOPTIONS, false);
-        if (is_null($count_options)){
-            $count_options = $default_count_options;
+        $countoptions = $this->get_settings_value(self::COUNTOPTIONS, false);
+        if (is_null($countoptions)) {
+            $countoptions = $defaultcountoptions;
         }
-        // $rating_value_counter defines the id/value of the label (first choice has a high value)
-        for ($i = 1, $rating_value_counter = $count_options; $i <= $count_options; $i++,$rating_value_counter--) {
-            $output[$rating_value_counter] =  get_string(strategy::STRATEGYID . '_no_choice', ratingallocate_MOD_NAME, $i);
+        // The variable $ratingvaluecounter defines the id/value of the label (first choice has a high value).
+        for ($i = 1, $ratingvaluecounter = $countoptions; $i <= $countoptions; $i++, $ratingvaluecounter--) {
+            $output[$ratingvaluecounter] = get_string(self::STRATEGYID . '_no_choice', ratingallocate_MOD_NAME, $i);
         }
         return $output;
     }
-    
-    protected function getValidationInfo(){
-        return array(self::COUNTOPTIONS => array(true,1)
+
+    protected function get_validation_info() {
+        return array(self::COUNTOPTIONS => array(true, 1)
         );
     }
 
 }
 
-// register with the strategymanager
+// Register with the strategymanager.
 \strategymanager::add_strategy(strategy::STRATEGYID);
 
 /**
@@ -91,11 +91,11 @@ class strategy extends \strategytemplate {
  * - shows a drop down menu from which the user can choose a rating
  */
 class mod_ratingallocate_view_form extends \ratingallocate_strategyform {
-    
-    protected function construct_strategy($strategyoptions){
+
+    protected function construct_strategy($strategyoptions) {
         return new strategy($strategyoptions);
     }
-    
+
     public function definition() {
         global $USER;
         parent::definition();
@@ -118,15 +118,16 @@ class mod_ratingallocate_view_form extends \ratingallocate_strategyform {
         }
 
         foreach ($ratingdata as $data) {
-            // If there is a valid value in the databse, choose the according rating
-            // from the dropdown.
+            // If there is a valid value in the databse, choose the according rating from the dropdown.
             // Else use a default value.
-            if (is_numeric($data->rating) && $data->rating >= 0 && $mform->elementExists('choice[' . ($choicecounter - ($data->rating - 1)) . ']')) {
+            if (is_numeric($data->rating) && $data->rating >= 0 &&
+                $mform->elementExists('choice[' . ($choicecounter - ($data->rating - 1)) . ']')) {
                 $mform->getElement('choice[' . ($choicecounter - ($data->rating - 1)) . ']')->setSelected($data->choiceid);
             }
         }
 
-        $mform->addElement('header', 'choice_descriptions', get_string(strategy::STRATEGYID . '_header_description', ratingallocate_MOD_NAME));
+        $mform->addElement('header', 'choice_descriptions',
+            get_string(strategy::STRATEGYID . '_header_description', ratingallocate_MOD_NAME));
 
         foreach ($ratingdata as $data) {
             // Show max. number of allocations.
@@ -151,7 +152,7 @@ class mod_ratingallocate_view_form extends \ratingallocate_strategyform {
         $select->setLabel(get_string(strategy::STRATEGYID . '_no_choice', ratingallocate_MOD_NAME, $i));
         $select->addOption(get_string(strategy::STRATEGYID . '_choice_none', ratingallocate_MOD_NAME, $i),
             '', array('disabled' => 'disabled'));
-        foreach ( $choices as $id => $name ) {
+        foreach ($choices as $id => $name) {
             $select->addOption( $name, $id );
         }
         $select->setSelected('');
@@ -178,7 +179,7 @@ class mod_ratingallocate_view_form extends \ratingallocate_strategyform {
         }
 
         if (isset($data->choice)) {
-            // we do assign the highest rating to choice no.1
+            // We do assign the highest rating to the first choice.
             $maxrating = count($data->choice);
             foreach ($data->choice as $prio => $curchoice) {
                 $data->data[$curchoice]['rating'] = $maxrating - ($prio - 1);
@@ -192,7 +193,7 @@ class mod_ratingallocate_view_form extends \ratingallocate_strategyform {
         $errors = parent::validation($data, $files);
         $usedchoices = array();
 
-        // no data exists, so skip
+        // No data exists, so skip.
         if (!array_key_exists('choice', $data)) {
             return $errors;
         }

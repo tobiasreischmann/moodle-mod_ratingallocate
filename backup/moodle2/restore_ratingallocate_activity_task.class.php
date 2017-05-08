@@ -8,11 +8,11 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
@@ -26,8 +26,8 @@
  * ratingallocate restore task that provides all the settings and steps to perform one
  * complete restore of the activity
  */
-
-require_once($CFG->dirroot . '/mod/ratingallocate/backup/moodle2/restore_ratingallocate_activity_stepslib.php'); // Because it exists (must)
+defined('MOODLE_INTERNAL') || die();
+require_once($CFG->dirroot . '/mod/ratingallocate/backup/moodle2/restore_ratingallocate_activity_stepslib.php');
 
 class restore_ratingallocate_activity_task extends restore_activity_task {
 
@@ -35,14 +35,14 @@ class restore_ratingallocate_activity_task extends restore_activity_task {
      * Define (add) particular settings this activity can have
      */
     protected function define_my_settings() {
-        // No particular settings for this activity
+        // No particular settings for this activity.
     }
 
     /**
      * Define (add) particular steps this activity can have
      */
     protected function define_my_steps() {
-        // ratingallocate only has one structure step
+        // Ratingallocate only has one structure step.
         $this->add_step(new restore_ratingallocate_activity_structure_step('ratingallocate_structure', 'ratingallocate.xml'));
     }
 
@@ -105,7 +105,7 @@ class restore_ratingallocate_activity_task extends restore_activity_task {
     static public function define_restore_log_rules_for_course() {
         $rules = array();
 
-        // Fix old wrong uses (missing extension)
+        // Fix old wrong uses (missing extension).
         // $rules[] = new restore_log_rule('raitingallocate', 'view all', 'index?id={course}', null,
         // null, null, 'index.php?id={course}');
         // $rules[] = new restore_log_rule('raitingallocate', 'view all', 'index.php?id={course}', null);
