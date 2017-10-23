@@ -1213,8 +1213,27 @@ class ratingallocate {
             AND al.userid = :userid';
 
         return $this->db->get_records_sql($sql, array(
-                    'ratingallocateid' => $this->ratingallocateid,
-                    'userid' => $userid
+            'ratingallocateid' => $this->ratingallocateid,
+            'userid' => $userid
+        ));
+    }
+
+    /**
+     * Returns all users with existing rating and without allocation in this instance of ratingallocate.
+     * @return array ids of raters.
+     */
+    public function get_raters_with_rating_and_without_allocation() {
+        $sql = 'SELECT DISTINCT r.userid
+            FROM {ratingallocate_choices} c
+            JOIN {ratingallocate_ratings} r
+            ON c.id = r.choiceid
+            LEFT JOIN {ratingallocate_allocations} al
+            ON r.userid = al.userid
+            WHERE c.ratingallocateid = :ratingallocateid
+            AND al.id is NULL';
+
+        return $this->db->get_records_sql($sql, array(
+            'ratingallocateid' => $this->ratingallocateid,
         ));
     }
 

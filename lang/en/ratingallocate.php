@@ -89,6 +89,7 @@ $string['algorithm_scheduled_for_cron']='The allocation algorithm run is schedul
 $string['start_distribution'] = 'Run Allocation Algorithm';
 $string['confirm_start_distribution'] = 'Running the algorithm will delete all existing allocations, if any. Are you sure to continue?';
 $string['unassigned_users'] = 'Unassigned Users';
+$string['notparticipated_users'] = 'Unassigned Users without rating';
 $string['invalid_dates'] = 'Dates are invalid. Starting date must be before ending date.';
 $string['invalid_publishdate'] = 'Publication date is invalid. Publication date must be after the end of rating.';
 $string['rated'] = 'rated {$a}';
@@ -148,10 +149,10 @@ $string['show_allocation_statistics'] = 'Show Allocation Statistics';
 $string['allocation_statistics_description'] = 'This table gives an impression of the overall satisfaction of the allocation.
 It is counting the allocations according to the rating the user has given to the respective choice.
 In this case {$a->users} out of {$a->total} users got a choice they rated with "{$a->rating}".
-For {$a->unassigned} users no choice has been allocated yet.';
+For {$a->unassigned} users no choice has been allocated yet. {$a->notparticipated} users in the course have not participated in the rating.';
 $string['allocation_statistics_description_no_alloc'] = 'This statistic gives an impression of the overall satisfaction of the allocation.
 It is counting the allocations according to the rating the user has given to the respective choice.
-There are no allocations yet. Currently {$a->unassigned} users have given their rating.';
+There are no allocations yet. Currently {$a->ratinggiven} out of {$a->total} users have given their rating.';
 
 $string['rating_raw'] = '{$a}';
 // </editor-fold>

@@ -536,13 +536,24 @@ class mod_ratingallocate_renderer extends plugin_renderer_base {
             $allocationhead[$rating] = $cell;
         }
 
+        // Add cell for unassigned users, which have a rating.
         $cell = new html_table_cell();
-        $usersinchoice = $ratingallocate->get_raters_in_course();
-        $cell->text = count($usersinchoice) - count($memberships);
+        $userswithratingwithoutallocation = $ratingallocate->get_raters_with_rating_and_without_allocation();
+        $cell->text = count($userswithratingwithoutallocation);
         $allocationrow[] = $cell;
 
         $cell = new html_table_cell();
         $cell->text = get_string('unassigned_users', ratingallocate_MOD_NAME);
+        $allocationhead[] = $cell;
+
+        // Add cell for users, which did not participate yet.
+        $cell = new html_table_cell();
+        $usersinchoice = $ratingallocate->get_raters_in_course();
+        $cell->text = count($usersinchoice) - count($memberships) - count($userswithratingwithoutallocation);
+        $allocationrow[] = $cell;
+
+        $cell = new html_table_cell();
+        $cell->text = get_string('notparticipated_users', ratingallocate_MOD_NAME);
         $allocationhead[] = $cell;
 
         $allocationtable = new html_table();
@@ -554,12 +565,16 @@ class mod_ratingallocate_renderer extends plugin_renderer_base {
         if (count($distributiondata) == 0) {
             $output .= $this->format_text(get_string('allocation_statistics_description_no_alloc',
                 ratingallocate_MOD_NAME,
-                array('unassigned' => count($usersinchoice) - count($memberships))));
+                array('ratinggiven' => count($userswithratingwithoutallocation),
+                    'total'=> count($usersinchoice))));
         } else {
             $output .= $this->format_text(get_string('allocation_statistics_description', ratingallocate_MOD_NAME,
-            array('users' => $distributiondata[max(array_keys($distributiondata))], 'total' => count($memberships),
+            array('users' => $distributiondata[max(array_keys($distributiondata))],
+                'total' => count($memberships) + count($userswithratingwithoutallocation),
                 'rating' => $titles[max(array_keys($distributiondata))],
-                'unassigned' => count($usersinchoice) - count($memberships))));
+                'unassigned' => count($userswithratingwithoutallocation),
+                'notparticipated' => count($usersinchoice) - count($memberships)
+                    - count($userswithratingwithoutallocation))));
             $output .= html_writer::table($allocationtable);
         }
         $output .= $this->box_end();
